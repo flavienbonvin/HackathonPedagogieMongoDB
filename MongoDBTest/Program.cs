@@ -46,7 +46,7 @@ namespace MongoDBTest
 
         private static void MainProgram()
         {
-            
+
             int command = 0;
 
             while (command != 10)
@@ -56,10 +56,11 @@ namespace MongoDBTest
                     "\n\t(1) to list all the users available" +
                     "\n\t(2) create a new user" +
                     "\n\t(3) list all the question" +
-                    "\n\t(4) take the survey" + 
-                    "\n\t(5) show all the answer" + 
+                    "\n\t(4) take the survey" +
+                    "\n\t(5) show all the answer" +
                     "\n\t(6) add a question to the survey" +
-                    "\n\t(99) list all question types" +
+                    "\n\t(7) add a new question type" +
+                    "\n\t(8) list all question types" +
                     "\n\t(10) quit the program\nCommand: ";
 
                 Console.Write(operation);
@@ -94,7 +95,12 @@ namespace MongoDBTest
                         AddNewQuestion();
                         break;
 
-                    case 99:
+                    case 7:
+                        AddNewQuestionType();
+                        break;
+
+
+                    case 8:
                         ListAllQuestionTypes();
                         break;
                 }
@@ -154,7 +160,7 @@ namespace MongoDBTest
 
             foreach (var q in question)
             {
-                Console.WriteLine("Question: {0}, Answer: ", q.question);
+                Console.WriteLine("\nQuestion: {0}, Possible answer: ", q.question);
 
                 foreach (String s in q.answer)
                 {
@@ -168,7 +174,7 @@ namespace MongoDBTest
                     Console.WriteLine("Question type: {0}", qType.name);
                 }
 
-                Console.WriteLine();
+                Console.WriteLine("\n");
             }
         }
 
@@ -244,6 +250,7 @@ namespace MongoDBTest
                     }
                 }
                 collAnswer.InsertOne(answer);
+                Console.WriteLine("\n");
             }
         }
 
@@ -264,24 +271,24 @@ namespace MongoDBTest
                 Console.WriteLine("The answer is from: ");
                 foreach (var u in user)
                 {
-                    Console.WriteLine("Fistname {0}, \t Lastname {1}, \t email {2}", u.name, u.lastname, u.email);
+                    Console.WriteLine("\tFistname {0}, \t Lastname {1}, \t email {2}", u.name, u.lastname, u.email);
                 }
 
                 var question = collQuestion.Find(b => b._id == a.questionID).Limit(1).ToListAsync().Result;
 
-                Console.WriteLine("\nThe question was: ");
+                Console.WriteLine("The question was: ");
                 foreach (var q in question)
                 {
-                    Console.WriteLine("Question: {0}", q.question);
+                    Console.WriteLine("\tQuestion: {0}", q.question);
                 }
 
-                Console.WriteLine("\nThe participant answered: ");
+                Console.WriteLine("The participant answered: ");
                 for (int i = 0; i < a.answer.Length; i++)
                 {
                     Console.WriteLine("\t" + a.answer[i]);
                 }
 
-                Console.WriteLine();
+                Console.WriteLine("-------------------------------------------------------------------------------------------\n");
             }
         }
 
@@ -344,6 +351,23 @@ namespace MongoDBTest
             collQuestion.InsertOne(questionToAdd);
         }
 
+        /****************************************************************************************************************************
+         *
+         *  CREATE A NEW QUESTION TYPE
+         * 
+         */
+        private static void AddNewQuestionType()
+        {
+            Console.Write("What's the new question type you want to add? ");
+
+            var temp = Console.ReadLine();
+            String questionType = Convert.ToString(temp);
+
+            var questionTypeToAdd = new Collections.QuestionType();
+
+            questionTypeToAdd.name = questionType;
+            collQuestionType.InsertOne(questionTypeToAdd);
+        }
 
         /****************************************************************************************************************************
          *
@@ -354,6 +378,7 @@ namespace MongoDBTest
         {
             var questionType = collQuestionType.Find(b => true).ToListAsync().Result;
 
+            Console.WriteLine("List of all question type");
             foreach (var q in questionType)
             {
                 Console.WriteLine("Name : {0}", q.name);
